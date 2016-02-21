@@ -30,7 +30,9 @@ public class DoublyLinkedListTest {
 		list.addLast(6);
 		list.addLast(7);
 		list.addLast(8);
-		assertEquals((Integer) 7, list.getNode(2).getData());
+		list.addLast(9);
+		
+		assertEquals((Integer) 6, list.getNode(1).getData());
 	}
 	@Test
 	public void AddFirstLastMix() {
@@ -48,6 +50,18 @@ public class DoublyLinkedListTest {
 	public void testGetFirstEmpty() {
 		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
 		list.getFirst();
+	}
+	@Test
+	public void AddIndex() {
+		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
+		list.addLast(5);
+		list.addLast(6);
+		list.addLast(7);
+		list.addLast(8);
+		list.addLast(9);
+		list.add(3, 1);
+		
+		assertEquals((Integer) 9, list.getNode(5).getData());
 	}
 
 }

@@ -38,8 +38,8 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 		Node(E data) {
 			this.data = data;
 		}
-		
-		public E getData(){
+
+		public E getData() {
 			return data;
 		}
 	}
@@ -84,10 +84,28 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
 	@Override
 	public void add(int index, E element) throws IndexOutOfBoundsException {
-		if (index > size - 1 || index < 0) {
+		if (index > size || index < 0) {
 			throw new IndexOutOfBoundsException();
 		}
-		Node<E> n = new Node<E>(element);
+		Node<E> inputNode = new Node<E>(element);
+		if (index == 0) {
+			addFirst(element);
+		} else if (index == size) {
+			addLast(element);
+		} else {
+			// The node at the index will be shifted after the input node
+			Node<E> atIndex = getNode(index);
+			// input node's next becomes the atIndex node.
+			inputNode.next = atIndex;
+			// input node's previous becomes the atIndex node previous
+			inputNode.previous = atIndex.previous;
+			// atIndex node replaced by input node now that next and previous
+			// are set
+			atIndex.previous.next = inputNode;
+			// atIndex node's previous changes to the input node
+			inputNode.next.previous = inputNode;
+			size++;
+		}
 
 	}
 
@@ -164,21 +182,23 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	// Helper method, returns the node at index of i
-	Node<E> getNode(int i) {
+	Node<E> getNode(int index) {
 		Node<E> n;
-		if (i < size / 2) {
+		int i = 0;
+		if (index < size / 2) {
 			n = first;
 			// n less than size/2, iterate from start
-			while (i > 0) {
-				i--;
+			while (i < index) {
+				i++;
 				n = n.next;
 			}
 		} else {
+			index = size - 1 - index;
 			n = last;
 			// n greater than size/2, iterate from end
-			while (i < size-1) {
+			while (i < index) {
 				i++;
 				n = n.previous;
 			}
