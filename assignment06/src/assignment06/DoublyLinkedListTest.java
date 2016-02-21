@@ -32,7 +32,7 @@ public class DoublyLinkedListTest {
 		list.addLast(8);
 		list.addLast(9);
 		
-		assertEquals((Integer) 6, list.getNode(1).getData());
+		assertEquals((Integer) 6, list.get(1));
 	}
 	@Test
 	public void AddFirstLastMix() {
@@ -61,7 +61,22 @@ public class DoublyLinkedListTest {
 		list.addLast(9);
 		list.add(3, 1);
 		
-		assertEquals((Integer) 9, list.getNode(5).getData());
+		assertEquals((Integer) 9, list.get(5));
+	}
+	@Test
+	public void RemoveFirst() {
+		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
+		list.addLast(0);
+		list.addLast(1);
+		list.addLast(2);
+		list.addLast(3);
+		list.addLast(4);
+		
+		assertEquals((Integer) 0, list.removeFirst());
+		for(int i = 0; i<list.size(); i++){
+			Integer result = new Integer(i+1);
+			assertEquals(result, list.get(i));
+		}
 	}
 
 }

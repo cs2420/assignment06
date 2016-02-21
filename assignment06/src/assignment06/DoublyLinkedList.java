@@ -19,7 +19,7 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 	}
 
 	// Node class
-	public static final class Node<E> {
+	private static final class Node<E> {
 		/** The element in the list. */
 		E data;
 
@@ -39,9 +39,6 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 			this.data = data;
 		}
 
-		public E getData() {
-			return data;
-		}
 	}
 
 	@Override
@@ -127,14 +124,27 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
 	@Override
 	public E get(int index) throws IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
+		if (index < 0 || index > size - 1) {
+			throw new NoSuchElementException();
+		}
+		return getNode(index).data;
 	}
 
 	@Override
 	public E removeFirst() throws NoSuchElementException {
-		// TODO Auto-generated method stub
-		return null;
+		if (size == 0) {
+			throw new NoSuchElementException();
+		}
+		E result = first.data;
+		if (size == 1) {
+			first = null;
+			last = null;
+		} else {
+			first = first.next;
+			first.previous = null;
+		}
+		size--;
+		return result;
 	}
 
 	@Override
@@ -167,8 +177,7 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
 	@Override
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
+		return size == 0;
 	}
 
 	@Override
@@ -184,7 +193,7 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 	}
 
 	// Helper method, returns the node at index of i
-	Node<E> getNode(int index) {
+	private Node<E> getNode(int index) {
 		Node<E> n;
 		int i = 0;
 		if (index < size / 2) {
