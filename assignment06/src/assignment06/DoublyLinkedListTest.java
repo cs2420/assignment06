@@ -8,12 +8,41 @@ import java.util.NoSuchElementException;
 public class DoublyLinkedListTest {
 
 	@Test
-	public void testAddFirstEmpty() {
+	public void AddFirstEmpty() {
 		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
 		assertEquals(0, list.size());
 		list.addFirst(5);
-		assertEquals(5, list.getFirst());
+		assertEquals((Integer)5, list.getFirst());
 		assertEquals(1, list.size());
+	}
+	@Test
+	public void AddLastEmpty() {
+		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
+		assertEquals(0, list.size());
+		list.addLast(5);
+		assertEquals((Integer)5, list.getLast());
+		assertEquals(1, list.size());
+	}
+	@Test
+	public void GetNode() {
+		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
+		list.addLast(5);
+		list.addLast(6);
+		list.addLast(7);
+		list.addLast(8);
+		assertEquals((Integer) 7, list.getNode(2).getData());
+	}
+	@Test
+	public void AddFirstLastMix() {
+		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
+		list.addLast(5);
+		list.addFirst(4);
+		list.addFirst(3);
+		list.addFirst(2);
+		list.addLast(6);
+		assertEquals(5, list.size());
+		assertEquals((Integer)6, list.getLast());
+		assertEquals((Integer)2, list.getFirst());
 	}
 	@Test (expected=NoSuchElementException.class) 
 	public void testGetFirstEmpty() {

@@ -3,14 +3,14 @@ package assignment06;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class DoublyLinkedList<E> implements List, Iterable {
+public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
 	// number of elements in the list
 	private int size;
 	// first node
-	private Node first;
+	private Node<E> first;
 	// last node
-	private Node last;
+	private Node<E> last;
 
 	// constructor
 	public DoublyLinkedList() {
@@ -19,7 +19,7 @@ public class DoublyLinkedList<E> implements List, Iterable {
 	}
 
 	// Node class
-	private static final class Node<E> {
+	public static final class Node<E> {
 		/** The element in the list. */
 		E data;
 
@@ -38,88 +38,106 @@ public class DoublyLinkedList<E> implements List, Iterable {
 		Node(E data) {
 			this.data = data;
 		}
-	} 
+		
+		public E getData(){
+			return data;
+		}
+	}
 
 	@Override
-	public Iterator iterator() {
+	public Iterator<E> iterator() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void addFirst(Object element) {
-		Node<E> n = new Node((E) element);
+	public void addFirst(E element) {
+		Node<E> n = new Node<E>(element);
 		if (size == 0) {
 			first = n;
 			last = n;
-		}
-		else{
+		} else {
 			n.next = first;
 			first.previous = n;
 			first = n;
-			
+
 		}
 		size++;
 
 	}
 
 	@Override
-	public void addLast(Object o) {
-		// TODO Auto-generated method stub
+	public void addLast(E o) {
+		Node<E> n = new Node<E>(o);
+		if (size == 0) {
+			first = n;
+			last = n;
+		} else {
+			n.previous = last;
+			last.next = n;
+			last = n;
+
+		}
+		size++;
 
 	}
 
 	@Override
-	public void add(int index, Object element) throws IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
+	public void add(int index, E element) throws IndexOutOfBoundsException {
+		if (index > size - 1 || index < 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		Node<E> n = new Node<E>(element);
 
 	}
 
 	@Override
-	public Object getFirst() throws NoSuchElementException {
-		if(size == 0){
+	public E getFirst() throws NoSuchElementException {
+		if (size == 0) {
 			throw new NoSuchElementException();
 		}
 		return first.data;
 	}
 
 	@Override
-	public Object getLast() throws NoSuchElementException {
+	public E getLast() throws NoSuchElementException {
+		if (size == 0) {
+			throw new NoSuchElementException();
+		}
+		return last.data;
+	}
+
+	@Override
+	public E get(int index) throws IndexOutOfBoundsException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Object get(int index) throws IndexOutOfBoundsException {
+	public E removeFirst() throws NoSuchElementException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Object removeFirst() throws NoSuchElementException {
+	public E removeLast() throws NoSuchElementException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Object removeLast() throws NoSuchElementException {
+	public E remove(int index) throws IndexOutOfBoundsException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Object remove(int index) throws IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int indexOf(Object element) {
+	public int indexOf(E element) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	public int lastIndexOf(Object element) {
+	public int lastIndexOf(E element) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -145,6 +163,27 @@ public class DoublyLinkedList<E> implements List, Iterable {
 	public Object[] toArray() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	// Helper method, returns the node at index of i
+	Node<E> getNode(int i) {
+		Node<E> n;
+		if (i < size / 2) {
+			n = first;
+			// n less than size/2, iterate from start
+			while (i > 0) {
+				i--;
+				n = n.next;
+			}
+		} else {
+			n = last;
+			// n greater than size/2, iterate from end
+			while (i < size-1) {
+				i++;
+				n = n.previous;
+			}
+		}
+		return n;
 	}
 
 }
