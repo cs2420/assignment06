@@ -52,7 +52,7 @@ public class DoublyLinkedListTest {
 		list.getFirst();
 	}
 	@Test
-	public void AddIndex() {
+	public void AddAtIndex() {
 		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
 		list.addLast(5);
 		list.addLast(6);
