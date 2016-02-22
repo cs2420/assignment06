@@ -78,5 +78,34 @@ public class DoublyLinkedListTest {
 			assertEquals(result, list.get(i));
 		}
 	}
+	@Test
+	public void RemoveLast() {
+		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
+		list.addLast(0);
+		list.addLast(1);
+		list.addLast(2);
+		list.addLast(3);
+		list.addLast(4);
+		
+		assertEquals((Integer) 4, list.removeLast());
+		for(int i = 0; i<list.size(); i++){
+			Integer result = new Integer(i);
+			assertEquals(result, list.get(i));
+		}
+	}
+	@Test
+	public void RemoveIndex() {
+		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
+		list.addLast(0);
+		list.addLast(1);
+		list.addLast(2);
+		list.addLast(3);
+		list.addLast(4);
+		
+		assertEquals((Integer) 3, list.remove(3));
+		for(int i = 0; i<list.size(); i++){
+			System.out.println(list.get(i));
+		}
+	}
 
 }

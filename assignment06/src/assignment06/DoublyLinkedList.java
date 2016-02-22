@@ -149,14 +149,40 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
 	@Override
 	public E removeLast() throws NoSuchElementException {
-		// TODO Auto-generated method stub
-		return null;
+		if (size == 0) {
+			throw new NoSuchElementException();
+		}
+		E result = last.data;
+		if (size == 1) {
+			first = null;
+			last = null;
+		} else {
+			last = last.previous;
+			last.next = null;
+		}
+		size--;
+		return result;
 	}
 
 	@Override
 	public E remove(int index) throws IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
+		if (index > size-1 || index < 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		Node<E> n = getNode(index);
+		E result = n.data;
+		if(size == 1 || index == 0){
+			removeFirst();
+		}
+		else if(index == size-1){
+			removeLast();
+		}
+		else{
+			n.previous.next = n.next;
+			n.next.previous = n.previous;
+			size--;
+		}
+		return result;
 	}
 
 	@Override
