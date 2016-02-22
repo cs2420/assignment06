@@ -2,110 +2,270 @@ package assignment06;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class DoublyLinkedListTest {
+	DoublyLinkedList<Integer> empty;
+	DoublyLinkedList<Integer> oneItem;
+	DoublyLinkedList<Integer> multipleItems;
+	DoublyLinkedList<Integer> duplicateList;
+	
+	@Before
+	public void setUpLists(){
+		empty = new DoublyLinkedList<Integer>();
+		oneItem = new DoublyLinkedList<Integer>();
+		oneItem.addFirst(0);
+		multipleItems = new DoublyLinkedList<Integer>();
+		multipleItems.addLast(0);
+		multipleItems.addLast(1);
+		multipleItems.addLast(2);
+		multipleItems.addLast(3);
+		multipleItems.addLast(4);
+		
+		duplicateList = new DoublyLinkedList<Integer>();
+		duplicateList.addLast(0);
+		duplicateList.addLast(0);
+		duplicateList.addLast(1);
+		duplicateList.addLast(1);
+		duplicateList.addLast(2);
+		duplicateList.addLast(3);
+		duplicateList.addLast(4);
+		duplicateList.addLast(1);
+		duplicateList.addLast(4);
+		
+	}
 
 	@Test
-	public void AddFirstEmpty() {
-		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
-		assertEquals(0, list.size());
-		list.addFirst(5);
-		assertEquals((Integer)5, list.getFirst());
-		assertEquals(1, list.size());
-	}
-	@Test
-	public void AddLastEmpty() {
-		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
-		assertEquals(0, list.size());
-		list.addLast(5);
-		assertEquals((Integer)5, list.getLast());
-		assertEquals(1, list.size());
-	}
-	@Test
-	public void GetNode() {
-		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
-		list.addLast(5);
-		list.addLast(6);
-		list.addLast(7);
-		list.addLast(8);
-		list.addLast(9);
+	public void AddFirst() {
+		empty.addFirst(0);
+		assertEquals(1, empty.size());
+		assertEquals((Integer)0, empty.getFirst());
+		assertEquals((Integer)0, empty.getLast());
+		Integer result = new Integer(-1);
+		oneItem.addFirst(result);
+		assertEquals(result, oneItem.getFirst());
+		assertEquals((Integer)0, oneItem.getLast());
+		assertEquals(2, oneItem.size());
+		multipleItems.addFirst(-1);
+		multipleItems.addFirst(-2);
+		assertEquals(7, multipleItems.size());
+		Integer n = new Integer(-2);
+		assertEquals(n , multipleItems.getFirst());
+		assertEquals(result , multipleItems.get(1));
 		
-		assertEquals((Integer) 6, list.get(1));
 	}
+	
 	@Test
-	public void AddFirstLastMix() {
-		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
-		list.addLast(5);
-		list.addFirst(4);
-		list.addFirst(3);
-		list.addFirst(2);
-		list.addLast(6);
-		assertEquals(5, list.size());
-		assertEquals((Integer)6, list.getLast());
-		assertEquals((Integer)2, list.getFirst());
-	}
-	@Test (expected=NoSuchElementException.class) 
-	public void testGetFirstEmpty() {
-		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
-		list.getFirst();
-	}
-	@Test
-	public void AddAtIndex() {
-		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
-		list.addLast(5);
-		list.addLast(6);
-		list.addLast(7);
-		list.addLast(8);
-		list.addLast(9);
-		list.add(3, 1);
+	public void AddLast() {
+		empty.addLast(0);
+		assertEquals(1, empty.size());
+		assertEquals((Integer)0, empty.getFirst());
+		assertEquals((Integer)0, empty.getLast());
+		Integer result = new Integer(-1);
+		oneItem.addLast(result);
+		assertEquals(result, oneItem.getLast());
+		assertEquals((Integer)0, oneItem.getFirst());
+		assertEquals(2, oneItem.size());
 		
-		assertEquals((Integer) 9, list.get(5));
+		multipleItems.addLast(-1);
+		multipleItems.addLast(-2);
+		assertEquals(7, multipleItems.size());
+		Integer n = new Integer(-2);
+		assertEquals(n , multipleItems.getLast());
+		assertEquals(result , multipleItems.get(5));
+		
+	}
+	
+	@Test
+	public void add(){
+		empty.add(0, 0);
+		assertEquals(1, empty.size());
+		assertEquals((Integer)0, empty.getFirst());
+		assertEquals((Integer)0, empty.getLast());
+		
+		oneItem.add(0, -1);
+		assertEquals((Integer)(-1), oneItem.getFirst());
+		assertEquals((Integer)0, oneItem.getLast());
+		assertEquals(2, oneItem.size());
+		
+		multipleItems.add(0, -10);
+		multipleItems.add(2, 20);
+		multipleItems.add(6, 30);
+		multipleItems.add(8, 80);
+		assertEquals((Integer)(-10), multipleItems.getFirst());
+		
+		Integer[] array = {-10, 0, 20, 1, 2, 3, 30, 4, 80};
+		
+		for(int i = 0; i < 8; i++){
+			assertEquals(multipleItems.get(i), array[i]);
+		}
+	}
+	
+	@Test(expected = IndexOutOfBoundsException.class)
+	public void testAddExceptions(){
+		empty.add(5, 5);
+		empty.get(0);
+		multipleItems.add(6, 5);
+		multipleItems.add(-1, 5);
+		multipleItems.get(-1);
+		multipleItems.get(5);
+		empty.remove(0);
+		multipleItems.remove(-1);
+		multipleItems.remove(5);
+		multipleItems.remove(6);
+	}
+	
+	@Test(expected = NoSuchElementException.class)
+	public void testGetFirstAndLastExceptions(){
+		empty.getFirst();
+		empty.getLast();
+		empty.removeFirst();
+		empty.removeLast();
+		
+		multipleItems.clear();
+		multipleItems.getFirst();
+		multipleItems.getLast();
 	}
 	@Test
 	public void RemoveFirst() {
-		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
-		list.addLast(0);
-		list.addLast(1);
-		list.addLast(2);
-		list.addLast(3);
-		list.addLast(4);
-		
-		assertEquals((Integer) 0, list.removeFirst());
-		for(int i = 0; i<list.size(); i++){
-			Integer result = new Integer(i+1);
-			assertEquals(result, list.get(i));
+		assertEquals((Integer)0, oneItem.removeFirst());
+		assertEquals(0, oneItem.size());
+		assertEquals((Integer)0, multipleItems.removeFirst());
+		assertEquals(4, multipleItems.size());
+		assertEquals((Integer)1, multipleItems.removeFirst());
+		assertEquals(3, multipleItems.size());
+		Integer[] expectedResult = {2, 3, 4};
+		for(int i = 0; i<multipleItems.size(); i++){
+			assertEquals(multipleItems.get(i), expectedResult[i]);
 		}
+		
 	}
 	@Test
 	public void RemoveLast() {
-		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
-		list.addLast(0);
-		list.addLast(1);
-		list.addLast(2);
-		list.addLast(3);
-		list.addLast(4);
+		assertEquals((Integer)0, oneItem.removeLast());
+		assertEquals(0, oneItem.size());
+		assertEquals((Integer)4, multipleItems.removeLast());
+		assertEquals(4, multipleItems.size());
+		assertEquals((Integer)3, multipleItems.removeLast());
+		assertEquals(3, multipleItems.size());
+		Integer[] expectedResult = {0, 1, 2};
+		for(int i = 0; i<multipleItems.size(); i++){
+			assertEquals(multipleItems.get(i), expectedResult[i]);
+		}
 		
-		assertEquals((Integer) 4, list.removeLast());
-		for(int i = 0; i<list.size(); i++){
-			Integer result = new Integer(i);
-			assertEquals(result, list.get(i));
+	}
+	
+	@Test
+	public void remove(){
+		
+		assertEquals((Integer) 0, oneItem.remove(0));
+		assertEquals(0, oneItem.size());
+		
+		assertEquals((Integer) 0, multipleItems.remove(0));
+		assertEquals((Integer) 3, multipleItems.remove(2));
+		assertEquals((Integer) 2, multipleItems.remove(1));
+
+		
+		Integer[] array = { 1, 4};
+		
+		for(int i = 0; i < multipleItems.size(); i++){
+			assertEquals(multipleItems.get(i), array[i]);
 		}
 	}
+	
 	@Test
-	public void RemoveIndex() {
-		DoublyLinkedList<Integer> list = new DoublyLinkedList<Integer>();
-		list.addLast(0);
-		list.addLast(1);
-		list.addLast(2);
-		list.addLast(3);
-		list.addLast(4);
+	public void indexOf(){
+//		duplicateList.addLast(0);
+//		duplicateList.addLast(0);
+//		duplicateList.addLast(1);
+//		duplicateList.addLast(1);
+//		duplicateList.addLast(2);
+//		duplicateList.addLast(3);
+//		duplicateList.addLast(4);
+//		duplicateList.addLast(1);
+//		duplicateList.addLast(4);
+		Integer i = new Integer (0);
+		assertEquals(-1, empty.indexOf(i));
 		
-		assertEquals((Integer) 3, list.remove(3));
-		for(int i = 0; i<list.size(); i++){
-			System.out.println(list.get(i));
-		}
+		assertEquals(0, oneItem.indexOf(0));
+		assertEquals(-1, oneItem.indexOf(5));
+		
+		assertEquals(2, multipleItems.indexOf(2));
+		assertEquals(-1, multipleItems.indexOf(9));
+		
+		assertEquals(0, duplicateList.indexOf(0));
+		assertEquals(2, duplicateList.indexOf(1));
+		assertEquals(6, duplicateList.indexOf(4));
+		assertEquals(5, duplicateList.indexOf(3));
+		assertEquals(-1, duplicateList.indexOf(50));
+		
+	}
+	
+	@Test
+	public void lastIndexOf(){
+//		duplicateList.addLast(0);
+//		duplicateList.addLast(0);
+//		duplicateList.addLast(1);
+//		duplicateList.addLast(1);
+//		duplicateList.addLast(2);
+//		duplicateList.addLast(3);
+//		duplicateList.addLast(4);
+//		duplicateList.addLast(1);
+//		duplicateList.addLast(4);
+		Integer i = new Integer (0);
+		assertEquals(-1, empty.lastIndexOf(i));
+		
+		assertEquals(0, oneItem.lastIndexOf(0));
+		assertEquals(-1, oneItem.lastIndexOf(5));
+		
+		assertEquals(2, multipleItems.lastIndexOf(2));
+		assertEquals(-1, multipleItems.lastIndexOf(9));
+		
+		assertEquals(1, duplicateList.lastIndexOf(0));
+		assertEquals(7, duplicateList.lastIndexOf(1));
+		assertEquals(8, duplicateList.lastIndexOf(4));
+		assertEquals(5, duplicateList.lastIndexOf(3));
+		assertEquals(-1, duplicateList.lastIndexOf(50));
+		
+	}
+	
+	@Test
+	public void testClearAndIsEmpty(){
+		assertTrue(empty.isEmpty());
+		
+		assertFalse(oneItem.isEmpty());
+		oneItem.clear();
+		assertTrue(oneItem.isEmpty());
+		assertEquals(0, oneItem.size());
+		
+		assertFalse(multipleItems.isEmpty());
+		multipleItems.clear();
+		assertTrue(multipleItems.isEmpty());
+		assertEquals(0, multipleItems.size());
+		
+		multipleItems.add(0, 22);
+		multipleItems.removeFirst();
+		assertTrue(multipleItems.isEmpty());
+		assertEquals(0, multipleItems.size());
+	}
+	
+	@Test
+	public void testToArray(){
+		Object emptyArray[] = empty.toArray();
+		Object expectedEmptyArray[] = new Object[0];
+		assertArrayEquals(expectedEmptyArray, emptyArray);
+		
+		Object elementArray[] = oneItem.toArray();
+		assertEquals(0, elementArray[0]);
+		
+		Object multipleItemsArray[] = multipleItems.toArray();
+		for(int i = 0; i < multipleItems.size(); i++)
+			assertEquals(i, multipleItemsArray[i]);
+		
 	}
 
 }

@@ -50,8 +50,23 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
 	@Override
 	public Iterator<E> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+return new Iterator<E>() {
+			
+			private int cursor = 0;
+
+			public boolean hasNext() {
+				return cursor<size;
+			}
+
+			public E next() 
+			{
+				if(!hasNext())
+				{
+					throw new NoSuchElementException();
+				}
+				return get(cursor++);
+			}
+		};
 	}
 
 	/**
@@ -232,11 +247,6 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 	 */
 	@Override
 	public int indexOf(E element) {
-
-		// If the DoublyLinkedList is empty
-		if (this.size == 0)
-			return -1;
-
 		// Check the element of each node, starting at beginning
 		Node<E> currentNode = this.first;
 		for (int i = 0; i < this.size; i++){
@@ -254,10 +264,6 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 	 * list, or -1 if this list does not contain the element.
 	 */
 	public int lastIndexOf(E element) {
-		// If the DoublyLinkedList is empty
-		if (this.size == 0)
-			return -1;
-
 		// Check the element of each node, starting at end
 		Node<E> currentNode = this.last;
 		for (int i = this.size - 1; i >= 0; i--){
@@ -291,10 +297,8 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 	 */
 	@Override
 	public void clear() {
-		this.first.next = null;
-		this.first.data = null;
-		this.last.previous = null;
-		this.last.data = null;
+		this.first = null;
+		this.last = null;
 		size = 0;
 	}
 
