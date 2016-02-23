@@ -1,5 +1,6 @@
 package assignment06;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -49,28 +50,36 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
 			private int cursor = 0;
 			private boolean canRemove = false;
-
+			private E currentElement;
 			public boolean hasNext() {
 				return cursor < size;
 			}
 
 			public E next() {
-
+				
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				}
 				canRemove = true;
-				return get(cursor++);
+				currentElement = get(cursor++);
+				return currentElement;
 			}
 
 			public void remove() {
 				// If next() hasn't been called, can't remove
 				if (!canRemove)
 					throw new IllegalStateException();
-
+				if(!currentElement.equals(get(cursor-1))){
+					throw  new ConcurrentModificationException();
+				}
+				try{
 				cursor--;
 				DoublyLinkedList.this.remove(cursor);
 				canRemove = false;
+				}
+				catch (IndexOutOfBoundsException e){
+					throw  new ConcurrentModificationException();
+				}
 			}
 		};
 	}

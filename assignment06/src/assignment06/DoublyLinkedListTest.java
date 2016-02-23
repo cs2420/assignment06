@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -273,16 +274,126 @@ public class DoublyLinkedListTest {
 	
 	@Test
 	public void iteratorHasNext(){
-		//TODO
+		Iterator<Integer> emptyItr = empty.iterator();
+		Iterator<Integer> mItr = multipleItems.iterator();
+		Iterator<Integer> oneItr = oneItem.iterator();
+		
+		assertFalse(emptyItr.hasNext());
+		int i = 0;
+		assertTrue(mItr.hasNext());
+		while(mItr.hasNext()){
+			mItr.next();
+			i++;
+		}
+		assertFalse(mItr.hasNext());
+		assertEquals(5, i);
+		
+		int n = 0;
+		assertTrue(oneItr.hasNext());
+		while(oneItr.hasNext()){
+			oneItr.next();
+			n++;
+		}
+		assertFalse(oneItr.hasNext());
+		assertEquals(1, n);
+		
+		
 	}
 
 	@Test
 	public void iteratorNext(){
-		//TODO
+		Iterator<Integer> emptyItr = empty.iterator();
+		Iterator<Integer> mItr = multipleItems.iterator();
+		Iterator<Integer> oneItr = oneItem.iterator();
+		
+		Boolean exception = false;
+		Boolean emptyException = false;
+		Boolean oneException = false;
+		Integer i = 0;
+		while(mItr.hasNext()){
+			assertEquals(i, mItr.next());
+			i++;
+		}
+		try{
+			mItr.next();
+		}
+		catch (NoSuchElementException e){
+			exception = true;
+		}
+		assertTrue(exception);
+		
+		try{
+			emptyItr.next();
+		}
+		catch (NoSuchElementException e){
+			emptyException = true;
+		}
+		assertTrue(emptyException);
+		
+		Integer n = 0;
+		while(oneItr.hasNext()){
+			assertEquals(n,oneItr.next());
+			n++;
+		}
+		try{
+			oneItr.next();
+		}
+		catch (NoSuchElementException e){
+			oneException = true;
+		}
+		assertTrue(oneException);
 	}
 	
 	@Test
 	public void iteratorRemove(){
-		//TODO
+		Iterator<Integer> emptyItr = empty.iterator();
+		Iterator<Integer> mItr = multipleItems.iterator();
+		Iterator<Integer> oneItr = oneItem.iterator();
+		Boolean multiException = false;
+		Boolean emptyException = false;
+		Boolean oneException = false;
+		
+		try{
+			emptyItr.remove();
+		}
+		catch (IllegalStateException e){
+			emptyException = true;
+		}
+		assertTrue(emptyException);
+		
+		assertEquals((Integer) 0, oneItr.next());
+		oneItr.remove();
+		assertEquals(0, oneItem.size());
+		oneException = false;
+		try{
+			oneItr.remove();
+		}
+		catch (IllegalStateException e){
+			oneException = true;
+		}
+		assertTrue(oneException);
+		
+		assertEquals((Integer) 0, mItr.next());
+		assertEquals((Integer) 1, mItr.next());
+		mItr.remove();
+		assertEquals(4, multipleItems.size());
+		try{
+			mItr.remove();
+		}
+		catch (IllegalStateException e){
+			multiException = true;
+		}
+		assertTrue(multiException);
+		
+		mItr.next();
+		multipleItems.removeFirst();
+		multiException = false;
+		try{
+		mItr.remove();
+		}
+		catch (ConcurrentModificationException e){
+			multiException = true;
+		}
+		assertTrue(multiException);
 	}
 }
