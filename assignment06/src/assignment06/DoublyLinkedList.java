@@ -10,12 +10,9 @@ import java.util.NoSuchElementException;
  */
 public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
-	// number of elements in the list
-	private int size;
-	// first node
-	private Node<E> first;
-	// last node
-	private Node<E> last;
+	private int size; // number of elements in the list
+	private Node<E> first; // first node
+	private Node<E> last; // last node
 
 	/**
 	 * Default constructor for a doubly linked list.
@@ -30,12 +27,10 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 	 * @param <E>
 	 */
 	private static final class Node<E> {
-		// The element in the list.
-		E data;
-		// The next list entry, null if this is last.
-		Node<E> next;
-		// The previous list entry, null if this is first.
-		Node<E> previous;
+
+		E data; // The element contained in the node.
+		Node<E> next; // The next list entry, null if this is last.
+		Node<E> previous; // The previous list entry, null if this is first.
 
 		/**
 		 * Default constructor for a node.
@@ -50,21 +45,32 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
 	@Override
 	public Iterator<E> iterator() {
-return new Iterator<E>() {
-			
+		return new Iterator<E>() {
+
 			private int cursor = 0;
+			private boolean canRemove = false;
 
 			public boolean hasNext() {
-				return cursor<size;
+				return cursor < size;
 			}
 
-			public E next() 
-			{
-				if(!hasNext())
-				{
+			public E next() {
+
+				if (!hasNext()) {
 					throw new NoSuchElementException();
 				}
+				canRemove = true;
 				return get(cursor++);
+			}
+
+			public void remove() {
+				// If next() hasn't been called, can't remove
+				if (!canRemove)
+					throw new IllegalStateException();
+
+				cursor--;
+				DoublyLinkedList.this.remove(cursor);
+				canRemove = false;
 			}
 		};
 	}
@@ -74,14 +80,17 @@ return new Iterator<E>() {
 	 */
 	@Override
 	public void addFirst(E element) {
-		Node<E> n = new Node<E>(element);
+		Node<E> newNode = new Node<E>(element);
+		// If list is empty
 		if (size == 0) {
-			first = n;
-			last = n;
-		} else {
-			n.next = first;
-			first.previous = n;
-			first = n;
+			first = newNode;
+			last = newNode;
+		} 
+		// If list is not empty
+		else {
+			newNode.next = first;
+			first.previous = newNode;
+			first = newNode;
 		}
 		size++;
 
@@ -92,14 +101,17 @@ return new Iterator<E>() {
 	 */
 	@Override
 	public void addLast(E o) {
-		Node<E> n = new Node<E>(o);
+		Node<E> newNode = new Node<E>(o);
+		// If list is empty
 		if (size == 0) {
-			first = n;
-			last = n;
-		} else {
-			n.previous = last;
-			last.next = n;
-			last = n;
+			first = newNode;
+			last = newNode;
+		} 
+		// If list is not empty
+		else {
+			newNode.previous = last;
+			last.next = newNode;
+			last = newNode;
 		}
 		size++;
 
@@ -183,11 +195,15 @@ return new Iterator<E>() {
 		if (size == 0) {
 			throw new NoSuchElementException();
 		}
+		
 		E result = first.data;
+		// If there's only one item in linked list
 		if (size == 1) {
 			first = null;
 			last = null;
-		} else {
+		} 
+		// If there's multiple items in linked list
+		else {
 			first = first.next;
 			first.previous = null;
 		}
@@ -204,11 +220,15 @@ return new Iterator<E>() {
 		if (size == 0) {
 			throw new NoSuchElementException();
 		}
+		
 		E result = last.data;
+		// If there's only one item in linked list
 		if (size == 1) {
 			first = null;
 			last = null;
-		} else {
+		} 
+		// If there's multiple items in linked list
+		else {
 			last = last.previous;
 			last.next = null;
 		}
@@ -227,15 +247,20 @@ return new Iterator<E>() {
 			throw new IndexOutOfBoundsException();
 		}
 
-		Node<E> n = getNode(index);
-		E result = n.data;
+		Node<E> node = getNode(index);
+		E result = node.data;
+		// If removing first item
 		if (size == 1 || index == 0) {
 			removeFirst();
-		} else if (index == size - 1) {
+		}
+		// If removing last item
+		else if (index == size - 1) {
 			removeLast();
-		} else {
-			n.previous.next = n.next;
-			n.next.previous = n.previous;
+		} 
+		// Find and remove item
+		else {
+			node.previous.next = node.next;
+			node.next.previous = node.previous;
 			size--;
 		}
 		return result;
@@ -249,8 +274,8 @@ return new Iterator<E>() {
 	public int indexOf(E element) {
 		// Check the element of each node, starting at beginning
 		Node<E> currentNode = this.first;
-		for (int i = 0; i < this.size; i++){
-			if (currentNode.data == element)
+		for (int i = 0; i < this.size; i++) {
+			if (currentNode.data.equals(element))
 				return i;
 			currentNode = currentNode.next;
 		}
@@ -264,14 +289,14 @@ return new Iterator<E>() {
 	 * list, or -1 if this list does not contain the element.
 	 */
 	public int lastIndexOf(E element) {
-		// Check the element of each node, starting at end
+		// Check the element of each node, starting at back end
 		Node<E> currentNode = this.last;
-		for (int i = this.size - 1; i >= 0; i--){
-			if (currentNode.data == element)
+		for (int i = this.size - 1; i >= 0; i--) {
+			if (currentNode.data.equals(element))
 				return i;
 			currentNode = currentNode.previous;
 		}
-	
+
 		// If element was not found
 		return -1;
 	}
@@ -311,9 +336,9 @@ return new Iterator<E>() {
 
 		Object elementArray[] = new Object[this.size];
 		Node<E> currentNode = this.first;
-		
+
 		// Add each element in DoublyLinkedList to array
-		for (int i = 0; i < this.size; i++){
+		for (int i = 0; i < this.size; i++) {
 			elementArray[i] = currentNode.data;
 			currentNode = currentNode.next;
 		}
@@ -322,28 +347,33 @@ return new Iterator<E>() {
 	}
 
 	/**
-	 * Helper method, returns the node at index of i
+	 * Helper method, returns the node at the specified index.
 	 */
 	private Node<E> getNode(int index) {
-		Node<E> n;
+		Node<E> node;
 		int i = 0;
+
+		// If the index is in the first half of the list
 		if (index < size / 2) {
-			n = first;
-			// n less than size/2, iterate from start
+			node = first;
+			// node less than size/2, iterate from start
 			while (i < index) {
 				i++;
-				n = n.next;
-			}
-		} else {
-			index = size - 1 - index;
-			n = last;
-			// n greater than size/2, iterate from end
-			while (i < index) {
-				i++;
-				n = n.previous;
+				node = node.next;
 			}
 		}
-		return n;
+
+		// If the index is in the second half of the list
+		else {
+			index = size - 1 - index;
+			node = last;
+			// node greater than size/2, iterate from end
+			while (i < index) {
+				i++;
+				node = node.previous;
+			}
+		}
+		return node;
 	}
 
 }
