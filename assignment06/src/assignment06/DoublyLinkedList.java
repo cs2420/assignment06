@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 /**
  * An implementation of a Linked List.
  * 
- * @author Connor and Doug Garding
+ * @author Connor Ottenbacher and Doug Garding
  */
 public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
@@ -44,20 +44,27 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 		}
 	}
 
+	/**
+	 * Provides an iterator for the DoublyLinkedList.
+	 */
 	@Override
 	public Iterator<E> iterator() {
 		return new Iterator<E>() {
 
 			private boolean canRemove = false;
 			private Node<E> currentNode;
+			private int sizeForIterator = size;
 
 			public boolean hasNext() {
+				// List has at least one item, returns true
 				if (currentNode == null && first != null) {
 					return true;
 				}
+				// List is empty, returns false
 				if (currentNode == null && first == null) {
 					return false;
 				}
+				// Returns false if the iterator has reached the last node
 				return currentNode.next != null;
 			}
 
@@ -66,9 +73,14 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				}
-				else if (currentNode == null) {
+				// If the current node has not yet been set and the list has at
+				// least one item, sets current node to first
+				if (currentNode == null) {
 					currentNode = first;
+					canRemove = true;
+					return currentNode.data;
 				}
+				// Sets the current node to the next node
 				canRemove = true;
 				currentNode = currentNode.next;
 				return currentNode.data;
@@ -78,14 +90,19 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 				// If next() hasn't been called, can't remove
 				if (!canRemove)
 					throw new IllegalStateException();
-				// if(!currentElement.equals(currentNode.data)){
-				// throw new ConcurrentModificationException();
-				// }
+				// If the list's size has been modified by anything other than
+				// Iterators remove method, will
+				// throw concurrentModificationException
+				if (size != sizeForIterator)
+					throw new ConcurrentModificationException();
+				// removes the currentNode, throws an exception if this node was
+				// removed without Iterators remove method
 				try {
 					canRemove = false;
 					removeNode(currentNode);
 					currentNode = currentNode.previous;
-				} catch (IndexOutOfBoundsException e) {
+					sizeForIterator--;
+				} catch (NullPointerException e) {
 					throw new ConcurrentModificationException();
 				}
 			}
@@ -270,7 +287,10 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 		return result;
 	}
 
-	public void removeNode(Node<E> e) {
+	/**
+	 * Removes the Parameter node from this DoublyLinkedList
+	 */
+	private void removeNode(Node<E> e) {
 		// If removing first item
 		if (size == 1 || e == first) {
 			removeFirst();

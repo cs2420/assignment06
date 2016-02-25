@@ -8,7 +8,11 @@ import org.junit.Test;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
+/**
+ * A testing class to test the DoublyLinkedList.
+ * 
+ * @author Doug Garding and Connor Ottenbacher
+ */
 public class DoublyLinkedListTest {
 	DoublyLinkedList<Integer> empty;
 	DoublyLinkedList<Integer> oneItem;
@@ -395,5 +399,18 @@ public class DoublyLinkedListTest {
 			multiException = true;
 		}
 		assertTrue(multiException);
+	}
+	
+	@Test
+	public void removeIterator(){
+		Iterator<Integer> mItr = multipleItems.iterator();
+		int i = 0;
+		while(mItr.hasNext()){
+			mItr.next();
+			assertEquals((Integer)i, multipleItems.getFirst());
+			mItr.remove();
+			i++;
+		}
+		assertEquals(0, multipleItems.size());
 	}
 }
