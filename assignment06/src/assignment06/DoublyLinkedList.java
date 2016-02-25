@@ -48,37 +48,45 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 	public Iterator<E> iterator() {
 		return new Iterator<E>() {
 
-			private int cursor = 0;
 			private boolean canRemove = false;
-			private E currentElement;
+			private Node<E> currentNode;
+
 			public boolean hasNext() {
-				return cursor < size;
+				if (currentNode == null && first != null) {
+					return true;
+				}
+				if (currentNode == null && first == null) {
+					return false;
+				}
+				return currentNode.next != null;
 			}
 
 			public E next() {
-				
+
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				}
+				else if (currentNode == null) {
+					currentNode = first;
+				}
 				canRemove = true;
-				currentElement = get(cursor++);
-				return currentElement;
+				currentNode = currentNode.next;
+				return currentNode.data;
 			}
 
 			public void remove() {
 				// If next() hasn't been called, can't remove
 				if (!canRemove)
 					throw new IllegalStateException();
-				if(!currentElement.equals(get(cursor-1))){
-					throw  new ConcurrentModificationException();
-				}
-				try{
-				cursor--;
-				DoublyLinkedList.this.remove(cursor);
-				canRemove = false;
-				}
-				catch (IndexOutOfBoundsException e){
-					throw  new ConcurrentModificationException();
+				// if(!currentElement.equals(currentNode.data)){
+				// throw new ConcurrentModificationException();
+				// }
+				try {
+					canRemove = false;
+					removeNode(currentNode);
+					currentNode = currentNode.previous;
+				} catch (IndexOutOfBoundsException e) {
+					throw new ConcurrentModificationException();
 				}
 			}
 		};
@@ -94,7 +102,7 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 		if (size == 0) {
 			first = newNode;
 			last = newNode;
-		} 
+		}
 		// If list is not empty
 		else {
 			newNode.next = first;
@@ -115,7 +123,7 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 		if (size == 0) {
 			first = newNode;
 			last = newNode;
-		} 
+		}
 		// If list is not empty
 		else {
 			newNode.previous = last;
@@ -204,13 +212,13 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 		if (size == 0) {
 			throw new NoSuchElementException();
 		}
-		
+
 		E result = first.data;
 		// If there's only one item in linked list
 		if (size == 1) {
 			first = null;
 			last = null;
-		} 
+		}
 		// If there's multiple items in linked list
 		else {
 			first = first.next;
@@ -229,13 +237,13 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 		if (size == 0) {
 			throw new NoSuchElementException();
 		}
-		
+
 		E result = last.data;
 		// If there's only one item in linked list
 		if (size == 1) {
 			first = null;
 			last = null;
-		} 
+		}
 		// If there's multiple items in linked list
 		else {
 			last = last.previous;
@@ -258,21 +266,25 @@ public class DoublyLinkedList<E> implements List<E>, Iterable<E> {
 
 		Node<E> node = getNode(index);
 		E result = node.data;
+		removeNode(node);
+		return result;
+	}
+
+	public void removeNode(Node<E> e) {
 		// If removing first item
-		if (size == 1 || index == 0) {
+		if (size == 1 || e == first) {
 			removeFirst();
 		}
 		// If removing last item
-		else if (index == size - 1) {
+		else if (e == last) {
 			removeLast();
-		} 
+		}
 		// Find and remove item
 		else {
-			node.previous.next = node.next;
-			node.next.previous = node.previous;
+			e.previous.next = e.next;
+			e.next.previous = e.previous;
 			size--;
 		}
-		return result;
 	}
 
 	/**
