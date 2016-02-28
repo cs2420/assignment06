@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 /**
  * Represents a generic stack (first in, last out).
  * 
- * @author ??
+ * @author Connor Ottenbacher and Doug Garding
  * 
  * @param <E>
  *            -- the type of elements contained in the stack
@@ -23,15 +23,14 @@ public class LinkedListStack<E> {
 	 * Removes all of the elements from the stack.
 	 */
 	public void clear() {
-		// FILL IN
+		stack.clear();
 	}
 
 	/**
 	 * Returns true if the stack contains no elements.
 	 */
 	public boolean isEmpty() {
-		// FILL IN
-		return false;
+		return stack.isEmpty();
 	}
 
 	/**
@@ -39,8 +38,7 @@ public class LinkedListStack<E> {
 	 * stack. Throws NoSuchElementException if the stack is empty.
 	 */
 	public E peek() throws NoSuchElementException {
-		// FILL IN
-		return null;
+		return stack.getLast();
 	}
 
 	/**
@@ -48,15 +46,14 @@ public class LinkedListStack<E> {
 	 * NoSuchElementException if the stack is empty.
 	 */
 	public E pop() throws NoSuchElementException {
-		// FILL IN
-		return null;
+		return stack.removeLast();
 	}
 
 	/**
 	 * Pushes the input item onto the top of the stack.
 	 */
 	public void push(E item) {
-		// FILL IN
+		stack.addLast(item);
 	}
 
 	/**

@@ -1,12 +1,14 @@
 package assignment07;
 
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * Class containing the checkFile method for checking if the (, [, and { symbols
  * in an input file are correctly matched.
  * 
- * @author ??
+ * @author Connor Ottenbacher and Doug Garding
  */
 public class BalancedSymbolChecker {
 
@@ -14,9 +16,15 @@ public class BalancedSymbolChecker {
 	 * Returns a message indicating whether the input file has unmatched
 	 * symbols. (Use the methods below for constructing messages.) Throws
 	 * FileNotFoundException if the file does not exist.
+	 * @throws IOException, FileNotFoundException 
 	 */
-	public String checkFile(String filename) throws FileNotFoundException {
-		// FILL IN
+	public String checkFile(String filename) throws IOException, FileNotFoundException {
+		FileReader reader = new FileReader(filename);
+		LinkedListStack<Character> stack = new LinkedListStack<Character>();
+		int i;
+		while((i = reader.read())!=0){
+			char c = (char)i;
+		}
 		return null;
 	}
 
