@@ -22,8 +22,10 @@ public class BalancedSymbolChecker {
 		FileReader reader = new FileReader(filename);
 		LinkedListStack<Character> stack = new LinkedListStack<Character>();
 		int i;
+		char c;
+		//reads all the characters from the file. apparently this is more efficient than a scanner
 		while((i = reader.read())!=0){
-			char c = (char)i;
+			c = (char)i;
 		}
 		return null;
 	}
