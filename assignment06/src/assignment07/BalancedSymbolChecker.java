@@ -19,8 +19,12 @@ public class BalancedSymbolChecker {
 	 * FileNotFoundException if the file does not exist.
 	 * @throws IOException, FileNotFoundException 
 	 */
-	public String checkFile(String filename) throws IOException, FileNotFoundException {
+	public static String checkFile(String filename) throws IOException, FileNotFoundException {
+		// used to pair the symbols rather than doing it through multiple if statements
 		HashMap<Character, Character> symbol = new HashMap<Character, Character>();
+		symbol.put('(', ')');
+		symbol.put('{', '}');
+		symbol.put('[', ']');
 		symbol.put(')', '(');
 		symbol.put('}', '{');
 		symbol.put(']', '[');
@@ -30,7 +34,7 @@ public class BalancedSymbolChecker {
 		char c;
 		char popped;
 		//reads all the characters from the file. apparently this is more efficient than a scanner
-		while((i = reader.read())!=0){
+		while((i = reader.read())!=-1){
 			c = (char)i;
 			if(c=='(' ||c=='{' ||c=='['){
 				stack.push(c);
@@ -38,10 +42,13 @@ public class BalancedSymbolChecker {
 			if(c==')' ||c=='}' ||c==']'){
 				popped = stack.pop();
 				if(symbol.get(c)!=popped){
-					unmatchedSymbol(0, 0, c, symbol.get(c));
+					reader.close();
+					// need to figure out way of finding line/column
+					return unmatchedSymbol(0, 0, c, symbol.get(popped));
 				}
 			}
 		}
+		reader.close();
 		return null;
 	}
 
@@ -50,7 +57,7 @@ public class BalancedSymbolChecker {
 	 * column numbers. Indicates the symbol match that was expected and the
 	 * symbol that was read.
 	 */
-	private String unmatchedSymbol(int lineNumber, int colNumber, char symbolRead, char symbolExpected) {
+	private static String unmatchedSymbol(int lineNumber, int colNumber, char symbolRead, char symbolExpected) {
 		return "ERROR: Unmatched symbol at line " + lineNumber + " and column " + colNumber + ". Expected " + symbolExpected
 				+ ", but read " + symbolRead + " instead.";
 	}
