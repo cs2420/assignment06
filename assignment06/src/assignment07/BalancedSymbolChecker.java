@@ -3,6 +3,7 @@ package assignment07;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * Class containing the checkFile method for checking if the (, [, and { symbols
@@ -19,13 +20,27 @@ public class BalancedSymbolChecker {
 	 * @throws IOException, FileNotFoundException 
 	 */
 	public String checkFile(String filename) throws IOException, FileNotFoundException {
+		HashMap<Character, Character> symbol = new HashMap<Character, Character>();
+		symbol.put(')', '(');
+		symbol.put('}', '{');
+		symbol.put(']', '[');
 		FileReader reader = new FileReader(filename);
 		LinkedListStack<Character> stack = new LinkedListStack<Character>();
 		int i;
 		char c;
+		char popped;
 		//reads all the characters from the file. apparently this is more efficient than a scanner
 		while((i = reader.read())!=0){
 			c = (char)i;
+			if(c=='(' ||c=='{' ||c=='['){
+				stack.push(c);
+			}
+			if(c==')' ||c=='}' ||c==']'){
+				popped = stack.pop();
+				if(symbol.get(c)!=popped){
+					unmatchedSymbol(0, 0, c, symbol.get(c));
+				}
+			}
 		}
 		return null;
 	}
