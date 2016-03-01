@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 /**
  * Class containing the checkFile method for checking if the (, [, and { symbols
@@ -33,23 +34,42 @@ public class BalancedSymbolChecker {
 		int i;
 		char c;
 		char popped;
+		int col = 1;
+		int row = 1;
 		//reads all the characters from the file. apparently this is more efficient than a scanner
 		while((i = reader.read())!=-1){
 			c = (char)i;
 			if(c=='(' ||c=='{' ||c=='['){
 				stack.push(c);
 			}
+			//increments column count
+			if(c=='\t' || c==' '){
+				col++;
+			}
+			//resets column and increments row count
+			if(c=='\n'){
+				col=1;
+				row++;
+			}
 			if(c==')' ||c=='}' ||c==']'){
+				if(stack.isEmpty()){
+					return unmatchedSymbol(row, col, c, ' ');
+				}
 				popped = stack.pop();
 				if(symbol.get(c)!=popped){
 					reader.close();
 					// need to figure out way of finding line/column
-					return unmatchedSymbol(0, 0, c, symbol.get(popped));
+					return unmatchedSymbol(row, col, c, symbol.get(popped));
 				}
 			}
 		}
+		if(!stack.isEmpty()){
+			return unmatchedSymbolAtEOF(symbol.get(stack.pop()));
+		}
+		else{
 		reader.close();
-		return null;
+		return allSymbolsMatch();
+		}
 	}
 
 	/**
@@ -66,21 +86,21 @@ public class BalancedSymbolChecker {
 	 * Returns an error message for unmatched symbol at the end of file.
 	 * Indicates the symbol match that was expected.
 	 */
-	private String unmatchedSymbolAtEOF(char symbolExpected) {
+	private static String unmatchedSymbolAtEOF(char symbolExpected) {
 		return "ERROR: Unmatched symbol at the end of file. Expected " + symbolExpected + ".";
 	}
 
 	/**
 	 * Returns an error message for a file that ends with an open /* comment.
 	 */
-	private String unfinishedComment() {
+	private static String unfinishedComment() {
 		return "ERROR: File ended before closing comment.";
 	}
 
 	/**
 	 * Returns a message for a file in which all symbols match.
 	 */
-	private String allSymbolsMatch() {
+	private static String allSymbolsMatch() {
 		return "No errors found. All symbols match.";
 	}
 }
