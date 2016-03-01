@@ -41,44 +41,49 @@ public class BalancedSymbolChecker {
 			// Search through each char in array of chars
 			for (int column = 0; column < charArray.length; column++) {
 				char currentChar = charArray[column];
-				char peekedItem = '0';
+				char topOfStack = '0';
 				try {
-					peekedItem = symbolStack.peek();
+					topOfStack = symbolStack.peek();
 				} catch (NoSuchElementException e) {
 				}
 
 				// If we hit an in-line comment
-				if (currentChar == '/' && charArray[column + 1] == '/' && peekedItem != '\"' && peekedItem != '*') {
+				if (currentChar == '/' && charArray[column + 1] == '/' && topOfStack != '\"' && topOfStack != '*') {
 					break;
 				}
 
 				// If we hit a char literal
-				if (currentChar == '\'' && peekedItem != '\"' && peekedItem != '*') {
+				if (currentChar == '\'' && topOfStack != '\"' && topOfStack != '*') {
 					currentChar = charArray[column + 3];
 					column = column + 3;
 				}
 
 				// If we hit a String literal
-				if (currentChar == '\"' && peekedItem != '\"' && peekedItem != '*') {
+				if (currentChar == '\"' && topOfStack != '\"' && topOfStack != '*') {
 					symbolStack.push('\"');
 					continue;
 				}
 
 				// If we hit the end of a String literal
-				if (currentChar == '\"' && peekedItem == '\"') {
+				if (currentChar == '\"' && topOfStack == '\"') {
+					// If there is a " char inside a String literal, ignore it
+					if(charArray[column - 1] == '\\'){
+						continue;
+					}
+					
 					symbolStack.pop();
 					continue;
 				}
 
 				// If we hit a block comment
-				if (currentChar == '/' && charArray[column + 1] == '*' && peekedItem != '\"' && peekedItem != '*') {
+				if (currentChar == '/' && charArray[column + 1] == '*' && topOfStack != '\"' && topOfStack != '*') {
 					symbolStack.push('*');
 					column++;
 					continue;
 				}
 
 				// If we hit the end of a block comment
-				if (currentChar == '*' && charArray[column + 1] == '/' && peekedItem != '\"' && peekedItem == '*') {
+				if (currentChar == '*' && charArray[column + 1] == '/' && topOfStack != '\"' && topOfStack == '*') {
 					symbolStack.pop();
 					column++;
 					continue;
@@ -87,7 +92,7 @@ public class BalancedSymbolChecker {
 				// If found opening symbol, push to stack
 				if (charArray[column] == '(' || charArray[column] == '{' || charArray[column] == '[') {
 					// If we're in a block comment or String literal, ignore
-					if (peekedItem == '\"' || peekedItem == '*') {
+					if (topOfStack == '\"' || topOfStack == '*') {
 						continue;
 					}
 
@@ -98,19 +103,19 @@ public class BalancedSymbolChecker {
 				// If found a closing symbol, ensure it's correct
 				if (charArray[column] == ')' || charArray[column] == '}' || charArray[column] == ']') {
 					// If we're in a block comment or String literal, ignore
-					if (peekedItem == '\"' || peekedItem == '*') {
+					if (topOfStack == '\"' || topOfStack == '*') {
 						continue;
 					}
 
 					// If the stacked symbol matches
-					if (checkMatch(charArray[column], peekedItem)) {
+					if (checkMatch(charArray[column], topOfStack)) {
 						symbolStack.pop();
 						continue;
 					}
 
 					// If the stacked symbol doesn't match
-					else if (!checkMatch(charArray[column], peekedItem)) {
-						return unmatchedSymbol(row, column + 1, charArray[column], reverseChar(peekedItem));
+					else if (!checkMatch(charArray[column], topOfStack)) {
+						return unmatchedSymbol(row, column + 1, charArray[column], reverseChar(topOfStack));
 					}
 				}
 

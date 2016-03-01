@@ -11,12 +11,6 @@ import static assignment07.BalancedSymbolChecker.*;
 public class SymbolCheckerTests {
 	
 	@Test
-	public void testClass00() throws FileNotFoundException, IOException {
-		assertEquals("ERROR: Unmatched symbol at line 6 and column 1. Expected ), but read } instead.",
-				checkFile("mytest.java"));
-	}
-	
-	@Test
 	public void testClass01() throws FileNotFoundException, IOException {
 		assertEquals("ERROR: Unmatched symbol at line 6 and column 1. Expected ), but read } instead.",
 				checkFile("Class1.java"));
