@@ -41,51 +41,54 @@ public class BalancedSymbolChecker {
 			// Search through each char in array of chars
 			for (int column = 0; column < charArray.length; column++) {
 				char currentChar = charArray[column];
+				char peekedItem = '0';
+				try {
+					peekedItem = symbolStack.peek();
+				} catch (NoSuchElementException e) {
+				}
 
 				// If we hit an in-line comment
-				if (currentChar == '/' && charArray[column + 1] == '/') {
+				if (currentChar == '/' && charArray[column + 1] == '/' && peekedItem != '\"' && peekedItem != '*') {
 					break;
 				}
 
 				// If we hit a char literal
-				if (currentChar == '\'') {
+				if (currentChar == '\'' && peekedItem != '\"' && peekedItem != '*') {
 					currentChar = charArray[column + 3];
 					column = column + 3;
 				}
 
 				// If we hit a String literal
-				if (currentChar == '\"') {
+				if (currentChar == '\"' && peekedItem != '\"' && peekedItem != '*') {
 					symbolStack.push('\"');
-					break;
+					continue;
 				}
 
 				// If we hit the end of a String literal
-				if (currentChar == '\"' && symbolStack.peek() == '\"') {
+				if (currentChar == '\"' && peekedItem == '\"') {
 					symbolStack.pop();
-					break;
+					continue;
 				}
 
 				// If we hit a block comment
-				if (currentChar == '/' && charArray[column + 1] == '*') {
+				if (currentChar == '/' && charArray[column + 1] == '*' && peekedItem != '\"' && peekedItem != '*') {
 					symbolStack.push('*');
 					column++;
-					break;
+					continue;
 				}
 
 				// If we hit the end of a block comment
-				if (currentChar == '*' && charArray[column + 1] == '/' && symbolStack.peek() == '*') {
+				if (currentChar == '*' && charArray[column + 1] == '/' && peekedItem != '\"' && peekedItem == '*') {
 					symbolStack.pop();
 					column++;
-					break;
+					continue;
 				}
 
 				// If found opening symbol, push to stack
 				if (charArray[column] == '(' || charArray[column] == '{' || charArray[column] == '[') {
 					// If we're in a block comment or String literal, ignore
-					if (!symbolStack.isEmpty()) {
-						if (symbolStack.peek() == '\"' || symbolStack.peek() == '*') {
-							continue;
-						}
+					if (peekedItem == '\"' || peekedItem == '*') {
+						continue;
 					}
 
 					symbolStack.push(charArray[column]);
@@ -95,26 +98,36 @@ public class BalancedSymbolChecker {
 				// If found a closing symbol, ensure it's correct
 				if (charArray[column] == ')' || charArray[column] == '}' || charArray[column] == ']') {
 					// If we're in a block comment or String literal, ignore
-					if (symbolStack.peek() == '\"' || symbolStack.peek() == '*') {
+					if (peekedItem == '\"' || peekedItem == '*') {
 						continue;
 					}
 
 					// If the stacked symbol matches
-					if (checkMatch(charArray[column], symbolStack.peek())) {
+					if (checkMatch(charArray[column], peekedItem)) {
 						symbolStack.pop();
 						continue;
 					}
 
 					// If the stacked symbol doesn't match
-					else if (!checkMatch(charArray[column], symbolStack.peek())) {
-						return unmatchedSymbol(row, column + 1, charArray[column], reverseChar(symbolStack.peek()));
+					else if (!checkMatch(charArray[column], peekedItem)) {
+						return unmatchedSymbol(row, column + 1, charArray[column], reverseChar(peekedItem));
 					}
 				}
 
 			}
 
+			// If there are still symbols on the stack when finished
+			if (!symbolStack.isEmpty() && !inputScanner.hasNextLine()) {
+				// If the symbol is from an open comment
+				if (symbolStack.peek() == '*') {
+					return unfinishedComment();
+				}
+				// If the symbol is an open bracket of some kind
+				return unmatchedSymbolAtEOF(reverseChar(symbolStack.peek()));
+			}
 		}
 
+		// All symbols matched up and none are left on the stack
 		return allSymbolsMatch();
 
 		// I DON'T KNOW HOW TO USE FILEREADER, SO I USED A SCANNER AND WE CAN
@@ -128,7 +141,11 @@ public class BalancedSymbolChecker {
 
 	/**
 	 * Private helper method that returns a closing character if passed an
-	 * opening character, and returns an opening character if passed an open one.
+	 * opening character, and returns an opening character if passed an open
+	 * one.
+	 * 
+	 * If no opening or closing brackets are passed, an empty space char is
+	 * returned.
 	 * 
 	 * @param originalSymbol
 	 */
@@ -143,9 +160,12 @@ public class BalancedSymbolChecker {
 			return '(';
 		} else if (originalSymbol == '}') {
 			return '{';
-		} else {
+		} else if (originalSymbol == '[') {
 			return ']';
 		}
+		//
+		else
+			return ' ';
 	}
 
 	private static boolean checkMatch(char closingSymbol, Character peekedChar) {
