@@ -17,6 +17,7 @@ public class BalancedSymbolChecker {
 
 	// *********************************************************
 	// I CHANGED ALL METHODS TO STATIC FOR TESTING, NEEDS TO BE CHANGED BACK!
+	// ALL TESTS SHOULD BE WORKING
 	// *********************************************************
 
 	/**
