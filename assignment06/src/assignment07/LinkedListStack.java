@@ -1,6 +1,5 @@
 package assignment07;
 
-import assignment06.DoublyLinkedList;
 import java.util.NoSuchElementException;
 
 /**

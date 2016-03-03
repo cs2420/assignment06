@@ -2,7 +2,6 @@ package assignment07;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -15,11 +14,6 @@ import java.util.Scanner;
  */
 public class BalancedSymbolChecker {
 
-	// *********************************************************
-	// I CHANGED ALL METHODS TO STATIC FOR TESTING, NEEDS TO BE CHANGED BACK!
-	// ALL TESTS SHOULD BE WORKING
-	// *********************************************************
-
 	/**
 	 * Returns a message indicating whether the input file has unmatched
 	 * symbols. (Use the methods below for constructing messages.) Throws
@@ -28,121 +22,112 @@ public class BalancedSymbolChecker {
 	 * @throws IOException,
 	 *             FileNotFoundException
 	 */
-	public static String checkFile(String filename) throws IOException, FileNotFoundException {
+	public String checkFile(String filename) throws IOException, FileNotFoundException {
 		LinkedListStack<Character> symbolStack = new LinkedListStack<Character>();
-		Scanner inputScanner = new Scanner(new File(filename));
 		int row = 0;
+		try (Scanner inputScanner = new Scanner(new File(filename))) {
+			// Search through each line of the input file
+			while (inputScanner.hasNextLine()) {
+				String currentLine = new String(inputScanner.nextLine());
+				char[] charArray = currentLine.toCharArray();
+				row++;
 
-		// Search through each line of the input file
-		while (inputScanner.hasNextLine()) {
-			String currentLine = new String(inputScanner.nextLine());
-			char[] charArray = currentLine.toCharArray();
-			row++;
-
-			// Search through each char in array of chars
-			for (int column = 0; column < charArray.length; column++) {
-				char currentChar = charArray[column];
-				char topOfStack = '0';
-				try {
-					topOfStack = symbolStack.peek();
-				} catch (NoSuchElementException e) {
-				}
-
-				// If we hit an in-line comment
-				if (currentChar == '/' && charArray[column + 1] == '/' && topOfStack != '\"' && topOfStack != '*') {
-					break;
-				}
-
-				// If we hit a char literal
-				if (currentChar == '\'' && topOfStack != '\"' && topOfStack != '*') {
-					currentChar = charArray[column + 3];
-					column = column + 3;
-				}
-
-				// If we hit a String literal
-				if (currentChar == '\"' && topOfStack != '\"' && topOfStack != '*') {
-					symbolStack.push('\"');
-					continue;
-				}
-
-				// If we hit the end of a String literal
-				if (currentChar == '\"' && topOfStack == '\"') {
-					// If there is a " char inside a String literal, ignore it
-					if(charArray[column - 1] == '\\'){
-						continue;
+				// Search through each char in array of chars
+				for (int column = 0; column < charArray.length; column++) {
+					char currentChar = charArray[column];
+					char peekedItem = '0';
+					try {
+						peekedItem = symbolStack.peek();
+					} catch (NoSuchElementException e) {
 					}
-					
-					symbolStack.pop();
-					continue;
-				}
 
-				// If we hit a block comment
-				if (currentChar == '/' && charArray[column + 1] == '*' && topOfStack != '\"' && topOfStack != '*') {
-					symbolStack.push('*');
-					column++;
-					continue;
-				}
+					// If we hit an in-line comment
+					if (currentChar == '/' && charArray[column + 1] == '/' && peekedItem != '\"' && peekedItem != '*') {
+						break;
+					}
 
-				// If we hit the end of a block comment
-				if (currentChar == '*' && charArray[column + 1] == '/' && topOfStack != '\"' && topOfStack == '*') {
-					symbolStack.pop();
-					column++;
-					continue;
-				}
+					// If we hit a char literal
+					if (currentChar == '\'' && peekedItem != '\"' && peekedItem != '*') {
+						currentChar = charArray[column + 3];
+						column = column + 3;
+					}
 
-				// If found opening symbol, push to stack
-				if (charArray[column] == '(' || charArray[column] == '{' || charArray[column] == '[') {
-					// If we're in a block comment or String literal, ignore
-					if (topOfStack == '\"' || topOfStack == '*') {
+					// If we hit a String literal
+					if (currentChar == '\"' && peekedItem != '\"' && peekedItem != '*') {
+						symbolStack.push('\"');
 						continue;
 					}
 
-					symbolStack.push(charArray[column]);
-					continue;
-				}
-
-				// If found a closing symbol, ensure it's correct
-				if (charArray[column] == ')' || charArray[column] == '}' || charArray[column] == ']') {
-					// If we're in a block comment or String literal, ignore
-					if (topOfStack == '\"' || topOfStack == '*') {
-						continue;
-					}
-
-					// If the stacked symbol matches
-					if (checkMatch(charArray[column], topOfStack)) {
+					// If we hit the end of a String literal
+					if (currentChar == '\"' && peekedItem == '\"') {
+						if (currentChar == '\"' && charArray[column - 1] == '\\') {
+							continue;
+						}
 						symbolStack.pop();
 						continue;
 					}
 
-					// If the stacked symbol doesn't match
-					else if (!checkMatch(charArray[column], topOfStack)) {
-						return unmatchedSymbol(row, column + 1, charArray[column], reverseChar(topOfStack));
+					// If we hit a block comment
+					if (currentChar == '/' && charArray[column + 1] == '*' && peekedItem != '\"' && peekedItem != '*') {
+						symbolStack.push('*');
+						column++;
+						continue;
 					}
+
+					// If we hit the end of a block comment
+					if (currentChar == '*' && charArray[column + 1] == '/' && peekedItem != '\"' && peekedItem == '*') {
+						symbolStack.pop();
+						column++;
+						continue;
+					}
+
+					// If found opening symbol, push to stack
+					if (charArray[column] == '(' || charArray[column] == '{' || charArray[column] == '[') {
+						// If we're in a block comment or String literal, ignore
+						if (peekedItem == '\"' || peekedItem == '*') {
+							continue;
+						}
+
+						symbolStack.push(charArray[column]);
+						continue;
+					}
+
+					// If found a closing symbol, ensure it's correct
+					if (charArray[column] == ')' || charArray[column] == '}' || charArray[column] == ']') {
+						// If we're in a block comment or String literal, ignore
+						if (peekedItem == '\"' || peekedItem == '*') {
+							continue;
+						}
+
+						// If the stacked symbol matches
+						if (checkMatch(charArray[column], peekedItem)) {
+							symbolStack.pop();
+							continue;
+						}
+
+						// If the stacked symbol doesn't match
+						else if (!checkMatch(charArray[column], peekedItem)) {
+							return unmatchedSymbol(row, column + 1, charArray[column], reverseChar(peekedItem));
+						}
+					}
+
 				}
 
-			}
-
-			// If there are still symbols on the stack when finished
-			if (!symbolStack.isEmpty() && !inputScanner.hasNextLine()) {
-				// If the symbol is from an open comment
-				if (symbolStack.peek() == '*') {
-					return unfinishedComment();
+				// If there are still symbols on the stack when finished
+				if (!symbolStack.isEmpty() && !inputScanner.hasNextLine()) {
+					// If the symbol is from an open comment
+					if (symbolStack.peek() == '*') {
+						return unfinishedComment();
+					}
+					// If the symbol is an open bracket of some kind
+					return unmatchedSymbolAtEOF(reverseChar(symbolStack.peek()));
 				}
-				// If the symbol is an open bracket of some kind
-				return unmatchedSymbolAtEOF(reverseChar(symbolStack.peek()));
 			}
-		}
+		} 
 
 		// All symbols matched up and none are left on the stack
 		return allSymbolsMatch();
 
-		// I DON'T KNOW HOW TO USE FILEREADER, SO I USED A SCANNER AND WE CAN
-		// SWITCH IT LATER
-		/*
-		 * FileReader reader = new FileReader(filename); int i; char c; //reads
-		 * all the characters from the file. apparently this is more efficient
-		 * than a scanner while((i = reader.read())!=0){ c = (char)i; }
-		 */
 	}
 
 	/**
@@ -155,7 +140,7 @@ public class BalancedSymbolChecker {
 	 * 
 	 * @param originalSymbol
 	 */
-	private static char reverseChar(char originalSymbol) {
+	private char reverseChar(char originalSymbol) {
 		if (originalSymbol == '(') {
 			return ')';
 		} else if (originalSymbol == '[') {
@@ -169,12 +154,11 @@ public class BalancedSymbolChecker {
 		} else if (originalSymbol == '[') {
 			return ']';
 		}
-		//
 		else
 			return ' ';
 	}
 
-	private static boolean checkMatch(char closingSymbol, Character peekedChar) {
+	private boolean checkMatch(char closingSymbol, Character peekedChar) {
 		if (closingSymbol == ')') {
 			return closingSymbol == reverseChar(peekedChar);
 		}
@@ -192,7 +176,7 @@ public class BalancedSymbolChecker {
 	 * column numbers. Indicates the symbol match that was expected and the
 	 * symbol that was read.
 	 */
-	private static String unmatchedSymbol(int lineNumber, int colNumber, char symbolRead, char symbolExpected) {
+	private String unmatchedSymbol(int lineNumber, int colNumber, char symbolRead, char symbolExpected) {
 		return "ERROR: Unmatched symbol at line " + lineNumber + " and column " + colNumber + ". Expected "
 				+ symbolExpected + ", but read " + symbolRead + " instead.";
 	}
@@ -201,21 +185,21 @@ public class BalancedSymbolChecker {
 	 * Returns an error message for unmatched symbol at the end of file.
 	 * Indicates the symbol match that was expected.
 	 */
-	private static String unmatchedSymbolAtEOF(char symbolExpected) {
+	private String unmatchedSymbolAtEOF(char symbolExpected) {
 		return "ERROR: Unmatched symbol at the end of file. Expected " + symbolExpected + ".";
 	}
 
 	/**
 	 * Returns an error message for a file that ends with an open /* comment.
 	 */
-	private static String unfinishedComment() {
+	private String unfinishedComment() {
 		return "ERROR: File ended before closing comment.";
 	}
 
 	/**
 	 * Returns a message for a file in which all symbols match.
 	 */
-	private static String allSymbolsMatch() {
+	private String allSymbolsMatch() {
 		return "No errors found. All symbols match.";
 	}
 }
